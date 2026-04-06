@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="hero section">
+    <div class="container hero-copy">
+      <h1>{{ section.extra.banner.title }}</h1>
+      <p>{{ section.extra.banner.content }}</p>
+      {% if section.extra.banner.button.enable %}
+        <a class="btn" href="{{ section.extra.banner.button.link }}">{{ section.extra.banner.button.label }}</a>
+      {% endif %}
+    </div>
+    <div class="container hero-media">
+      <img src="{{ section.extra.banner.image }}" alt="Banner image" />
+    </div>
+  </section>
+
+  {% for feature in section.extra.features %}
+    <section class="section feature-row">
+      <div class="container feature-grid">
+        <div>
+          <img src="{{ feature.image }}" alt="{{ feature.title }}" />
+        </div>
+        <div>
+          <h2>{{ feature.title }}</h2>
+          <p>{{ feature.content }}</p>
+          {% if feature.button.enable %}
+            <a class="btn" href="{{ feature.button.link }}">{{ feature.button.label }}</a>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+  {% endfor %}
+{% endblock content %}

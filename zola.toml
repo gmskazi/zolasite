@@ -1,16 +1,28 @@
-# The URL the site will be built for
 base_url = "https://nakatechlabs.com"
-
-# Whether to automatically compile all Sass files in the sass directory
+title = "NakaTechLabs"
+description = "Personal knowledge base for tech guides, notes, and tutorials."
 compile_sass = true
-
-# Whether to build a search index to be used later on by a JavaScript library
 build_search_index = true
+
+taxonomies = [
+    { name = "categories", feed = true },
+    { name = "tags", feed = true },
+]
 
 [markdown]
 
 [markdown.highlighting]
-theme = "catppuccin-mocha"
+# theme = "catppuccin-mocha"
+theme = "tokyo-night"
 
 [extra]
-# Put all your custom variables here
+author = "Aito Nakajima"
+copyright = "NakaTechLabs"
+main_nav = [
+    { name = "Home", url = "/" },
+    { name = "Blog", url = "/blog/" },
+    { name = "Categories", url = "/categories/" },
+]
+social_links = [
+    { name = "github", url = "https://www.github.com/gmskazi", icon = "github" },
+]

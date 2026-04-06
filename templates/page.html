@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} | {{ config.title }}{% endblock title %}
+{% block description %}{{ page.description | default(value=config.description) }}{% endblock description %}
+
+{% block content %}
+  <section class="section post-single">
+    <div class="container">
+      {% if page.extra.image %}
+        <img class="post-hero" src="{{ page.extra.image }}" alt="{{ page.title }}" />
+      {% endif %}
+
+      <h1>{{ page.title }}</h1>
+
+      <p class="meta">
+        {% if page.extra.author %}{{ page.extra.author }} · {% endif %}
+        {{ page.date | date(format="%B %-d, %Y") }}
+      </p>
+
+      {% if page.taxonomies.categories %}
+        <p class="meta">
+          {% for category in page.taxonomies.categories %}
+            <a href="{{ get_taxonomy_url(kind='categories', name=category) }}">{{ category }}</a>{% if not loop.last %}, {% endif %}
+          {% endfor %}
+        </p>
+      {% endif %}
+
+      {% if page.toc and page.toc | length > 0 %}
+        <details class="toc toc-collapsible">
+          <summary>Contents</summary>
+          <ul>
+            {% for heading in page.toc %}
+              <li>
+                <a href="{{ heading.permalink }}">{{ heading.title }}</a>
+                {% if heading.children and heading.children | length > 0 %}
+                  <ul>
+                    {% for child in heading.children %}
+                      <li>
+                        <a href="{{ child.permalink }}">{{ child.title }}</a>
+                        {% if child.children and child.children | length > 0 %}
+                          <ul>
+                            {% for subchild in child.children %}
+                              <li><a href="{{ subchild.permalink }}">{{ subchild.title }}</a></li>
+                            {% endfor %}
+                          </ul>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </details>
+      {% endif %}
+
+      <article class="content">{{ page.content | safe }}</article>
+
+      {% if page.taxonomies.tags %}
+        <div class="tag-list">
+          {% for tag in page.taxonomies.tags %}
+            <a href="{{ get_taxonomy_url(kind='tags', name=tag) }}">{{ tag }}</a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </section>
+{% endblock content %}

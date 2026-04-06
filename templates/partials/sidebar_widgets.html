@@ -1,0 +1,25 @@
+{% set categories = get_taxonomy(kind="categories") %}
+{% if categories.items %}
+  <section class="widget">
+    <h4>Categories</h4>
+    <ul>
+      {% for term in categories.items %}
+        <li>
+          <a href="{{ term.permalink }}">{{ term.name }} ({{ term.pages | length }})</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}
+
+{% set tags = get_taxonomy(kind="tags") %}
+{% if tags.items %}
+  <section class="widget">
+    <h4>Tags</h4>
+    <div class="tag-list">
+      {% for term in tags.items %}
+        <a href="{{ term.permalink }}">{{ term.name }}</a>
+      {% endfor %}
+    </div>
+  </section>
+{% endif %}

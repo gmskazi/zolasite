@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ term.name }} | {{ config.title }}{% endblock title %}
+
+{% block content %}
+  <section class="section page-header">
+    <div class="container">
+      <h1>{{ term.name }}</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container post-grid">
+      {% for page in term.pages %}
+        {% include "partials/blog_card.html" %}
+      {% endfor %}
+    </div>
+  </section>
+{% endblock content %}

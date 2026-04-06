@@ -1,0 +1,21 @@
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="{{ get_url(path='@/_index.md') }}">
+      <img src="{{ get_url(path='images/logoNTL-darkmode.png') }}" alt="{{ config.title }}" />
+    </a>
+
+    <nav class="header-nav" aria-label="Main navigation">
+      <ul class="main-nav">
+        {% for item in config.extra.main_nav %}
+          <li>
+            <a href="{{ item.url }}">{{ item.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <button type="button" id="open-search" class="search-btn" aria-label="Open search">Search</button>
+    </div>
+  </div>
+</header>

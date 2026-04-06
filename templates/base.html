@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}{{ config.title }}{% endblock title %}</title>
+    <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}" />
+    <link rel="icon" type="image/png" href="{{ get_url(path='images/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ get_url(path='main.css') }}" />
+  </head>
+  <body>
+    {% include "partials/header.html" %}
+    {% include "partials/search_modal.html" %}
+    <main>
+      {% block content %}{% endblock content %}
+    </main>
+    {% include "partials/footer.html" %}
+
+    <script src="{{ get_url(path='elasticlunr.min.js') }}"></script>
+    <script src="{{ get_url(path='search_index.en.js') }}"></script>
+    <script src="{{ get_url(path='js/search.js') }}"></script>
+  </body>
+</html>

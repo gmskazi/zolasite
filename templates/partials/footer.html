@@ -1,0 +1,19 @@
+<footer class="site-footer">
+  <div class="container footer-top">
+    <a class="brand" href="{{ get_url(path='@/_index.md') }}">
+      <img src="{{ get_url(path='images/logoNTL-darkmode.png') }}" alt="{{ config.title }}" />
+    </a>
+
+    <ul class="social-links">
+      {% for social in config.extra.social_links %}
+        <li>
+          <a href="{{ social.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social.name }}">{{ social.name }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="container footer-bottom">
+    <p>{{ config.extra.copyright }}</p>
+  </div>
+</footer>

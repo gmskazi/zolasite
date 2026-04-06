@@ -1,0 +1,28 @@
+<article class="post-card">
+  {% if page.extra.image %}
+    <a href="{{ page.permalink }}" class="post-card-image">
+      <img src="{{ page.extra.image }}" alt="{{ page.title }}" />
+    </a>
+  {% endif %}
+
+  <h3><a href="{{ page.permalink }}">{{ page.title }}</a></h3>
+
+  <p class="meta">
+    {% if page.extra.author %}{{ page.extra.author }} · {% endif %}
+    {{ page.date | date(format="%B %-d, %Y") }}
+  </p>
+
+  {% if page.taxonomies.categories %}
+    <p class="meta">
+      {% for category in page.taxonomies.categories %}
+        <a href="{{ get_taxonomy_url(kind='categories', name=category) }}">{{ category }}</a>{% if not loop.last %}, {% endif %}
+      {% endfor %}
+    </p>
+  {% endif %}
+
+  {% if page.summary %}
+    <p>{{ page.summary | striptags }}</p>
+  {% endif %}
+
+  <a class="btn btn-link" href="{{ page.permalink }}">Read more</a>
+</article>
