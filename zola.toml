@@ -1,6 +1,6 @@
 base_url = "https://nakatechlabs.com"
 title = "NakaTechLabs"
-description = "Personal knowledge base for tech guides, notes, and tutorials."
+description = "Personal knowledge base for guides, notes, and tutorials."
 compile_sass = true
 build_search_index = true
 
@@ -12,7 +12,6 @@ taxonomies = [
 [markdown]
 
 [markdown.highlighting]
-# theme = "catppuccin-mocha"
 theme = "tokyo-night"
 
 [extra]
