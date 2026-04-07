@@ -5,7 +5,7 @@
     <ul>
       {% for term in categories.items %}
         <li>
-          <a href="{{ term.permalink }}">{{ term.name }} ({{ term.pages | length }})</a>
+          <a href="{{ term.permalink | replace(from=config.base_url, to='') }}">{{ term.name }} ({{ term.pages | length }})</a>
         </li>
       {% endfor %}
     </ul>
@@ -18,7 +18,7 @@
     <h4>Tags</h4>
     <div class="tag-list">
       {% for term in tags.items %}
-        <a href="{{ term.permalink }}">{{ term.name }}</a>
+        <a href="{{ term.permalink | replace(from=config.base_url, to='') }}">{{ term.name }}</a>
       {% endfor %}
     </div>
   </section>

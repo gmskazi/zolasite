@@ -1,11 +1,12 @@
 <article class="post-card">
+  {% set page_href = page.permalink | replace(from=config.base_url, to="") %}
   {% if page.extra.image %}
-    <a href="{{ page.permalink }}" class="post-card-image">
+    <a href="{{ page_href }}" class="post-card-image">
       <img src="{{ page.extra.image }}" alt="{{ page.title }}" />
     </a>
   {% endif %}
 
-  <h3><a href="{{ page.permalink }}">{{ page.title }}</a></h3>
+  <h3><a href="{{ page_href }}">{{ page.title }}</a></h3>
 
   <p class="meta">
     {% if page.extra.author %}{{ page.extra.author }} · {% endif %}
@@ -15,7 +16,7 @@
   {% if page.taxonomies.categories %}
     <p class="meta">
       {% for category in page.taxonomies.categories %}
-        <a href="{{ get_taxonomy_url(kind='categories', name=category) }}">{{ category }}</a>{% if not loop.last %}, {% endif %}
+        <a href="{{ get_taxonomy_url(kind='categories', name=category) | replace(from=config.base_url, to='') }}">{{ category }}</a>{% if not loop.last %}, {% endif %}
       {% endfor %}
     </p>
   {% endif %}
@@ -24,5 +25,5 @@
     <p>{{ page.summary | striptags }}</p>
   {% endif %}
 
-  <a class="btn btn-link" href="{{ page.permalink }}">Read more</a>
+  <a class="btn btn-link" href="{{ page_href }}">Read more</a>
 </article>

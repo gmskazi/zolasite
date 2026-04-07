@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% block title %}{{ config.title }}{% endblock title %}</title>
     <meta name="description" content="{% block description %}{{ config.description }}{% endblock description %}" />
-    <link rel="icon" type="image/png" href="{{ get_url(path='images/favicon.png') }}" />
-    <link rel="stylesheet" href="{{ get_url(path='main.css') }}" />
+    <link rel="icon" type="image/png" href="/images/favicon.png" />
+    <link rel="stylesheet" href="/main.css" />
   </head>
   <body>
     {% include "partials/header.html" %}
@@ -16,9 +16,9 @@
     </main>
     {% include "partials/footer.html" %}
 
-    <script src="{{ get_url(path='elasticlunr.min.js') }}"></script>
-    <script src="{{ get_url(path='search_index.en.js') }}"></script>
-    <script src="{{ get_url(path='js/header.js') }}"></script>
-    <script src="{{ get_url(path='js/search.js') }}"></script>
+    <script src="/elasticlunr.min.js"></script>
+    <script src="/search_index.en.js"></script>
+    <script src="/js/header.js"></script>
+    <script src="/js/search.js"></script>
   </body>
 </html>
