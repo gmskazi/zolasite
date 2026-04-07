@@ -1,6 +1,6 @@
 # zolasite
 
-Custom Zola implementation for `https://nakatechlabs.com`, migrated from Hugo with a similar visual style.
+Custom Zola implementation for `https://nakatechlabs.com`
 
 ## Prerequisites
 
@@ -25,11 +25,3 @@ zola serve --drafts --open
 ```bash
 zola build
 ```
-
-## Migration Workflow
-
-1. Update content and assets from Hugo source
-2. Implement or adjust templates in `templates/`
-3. Style in `sass/main.scss` (dark-mode only)
-4. Run `zola build` to catch template/content issues
-5. Validate in browser with `zola serve --drafts --open`
