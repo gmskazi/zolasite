@@ -1,4 +1,4 @@
-# zolasite
+# Nakatechlabs site
 
 Custom Zola implementation for `https://nakatechlabs.com`
 
