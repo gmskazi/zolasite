@@ -4,6 +4,10 @@
 # Sass cache
 .sass-cache/
 
+# Node dependencies
+node_modules/
+npm-debug.log*
+
 # macOS
 .DS_Store
 AGENTS.md

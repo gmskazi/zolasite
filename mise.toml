@@ -1,0 +1,30 @@
+[tools]
+node = "22"
+zola = "0.22.1"
+gitleaks = "latest"
+
+[tasks.deps]
+description = "Install local lint dependencies"
+run = "npm install --no-fund --no-audit"
+
+[tasks."lint:md"]
+description = "Lint markdown content"
+depends = ["deps"]
+run = "npx markdownlint-cli2 \"README.md\" \"content/**/*.md\" \"docs/**/*.md\""
+
+[tasks."lint:scss"]
+description = "Lint SCSS styles"
+depends = ["deps"]
+run = "npx stylelint \"sass/**/*.scss\" --max-warnings 0"
+
+[tasks."scan:secrets"]
+description = "Scan repository history for secrets"
+run = "gitleaks git --redact --verbose"
+
+[tasks.build]
+description = "Build the site"
+run = "zola build"
+
+[tasks.check]
+description = "Run all checks"
+depends = ["scan:secrets", "lint:md", "lint:scss", "build"]

@@ -1,0 +1,9 @@
+{
+  "name": "zolasite",
+  "private": true,
+  "devDependencies": {
+    "markdownlint-cli2": "^0.18.1",
+    "stylelint": "^16.23.1",
+    "stylelint-config-standard-scss": "^14.0.0"
+  }
+}

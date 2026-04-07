@@ -1,0 +1,17 @@
+config:
+  default: true
+  # MD013: line-length rule (disabled to allow long commands/URLs/tables)
+  MD013: false
+  # MD024: duplicate-heading rule (disabled for repeated section names)
+  MD024: false
+  # MD034: no-bare-urls rule (disabled for raw URLs/emails in docs)
+  MD034: false
+  # MD033: no-inline-html rule (disabled to allow inline HTML snippets)
+  MD033: false
+  # MD041: first-line-heading rule (disabled because files start with front matter)
+  MD041: false
+
+globs:
+  - "README.md"
+  - "content/**/*.md"
+  - "docs/**/*.md"
