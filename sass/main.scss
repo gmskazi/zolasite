@@ -472,6 +472,23 @@ p {
   padding: 0;
 }
 
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.social-links a:hover,
+.social-links a:focus-visible {
+  color: var(--text-strong);
+}
+
+.social-links svg {
+  width: 1.45rem;
+  height: 1.45rem;
+}
+
 @media (min-width: 720px) {
   .post-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -543,9 +560,16 @@ p {
     text-align: center;
   }
 
-  .footer-top,
-  .footer-bottom {
-    flex-direction: column;
-    align-items: flex-start;
+  .footer-top {
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    flex-wrap: wrap;
+  }
+
+  .site-footer .brand img {
+    width: 130px;
+    height: 44px;
   }
 }

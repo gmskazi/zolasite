@@ -7,13 +7,19 @@
     <ul class="social-links">
       {% for social in config.extra.social_links %}
         <li>
-          <a href="{{ social.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social.name }}">{{ social.name }}</a>
+          <a href="{{ social.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social.name }}">
+            {% if social.icon == "github" %}
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.426 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.866-.014-1.699-2.782.605-3.369-1.344-3.369-1.344-.455-1.157-1.11-1.466-1.11-1.466-.907-.62.069-.608.069-.608 1.003.071 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.091-.647.349-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.56 9.56 0 0 1 12 6.844a9.56 9.56 0 0 1 2.504.337c1.909-1.296 2.748-1.026 2.748-1.026.546 1.379.203 2.398.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.848-2.338 4.695-4.566 4.943.359.31.678.921.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.481A10.02 10.02 0 0 0 22 12.017C22 6.484 17.523 2 12 2z"
+                  fill="currentColor" />
+              </svg>
+            {% else %}
+              {{ social.name }}
+            {% endif %}
+          </a>
         </li>
       {% endfor %}
     </ul>
-  </div>
-
-  <div class="container footer-bottom">
-    <p>{{ config.extra.copyright }}</p>
   </div>
 </footer>
