@@ -31,16 +31,16 @@
           <ul>
             {% for heading in page.toc %}
               <li>
-                <a href="{{ heading.permalink }}">{{ heading.title }}</a>
+                <a href="{{ heading.permalink | replace(from=config.base_url, to='') }}">{{ heading.title }}</a>
                 {% if heading.children and heading.children | length > 0 %}
                   <ul>
                     {% for child in heading.children %}
                       <li>
-                        <a href="{{ child.permalink }}">{{ child.title }}</a>
+                        <a href="{{ child.permalink | replace(from=config.base_url, to='') }}">{{ child.title }}</a>
                         {% if child.children and child.children | length > 0 %}
                           <ul>
                             {% for subchild in child.children %}
-                              <li><a href="{{ subchild.permalink }}">{{ subchild.title }}</a></li>
+                              <li><a href="{{ subchild.permalink | replace(from=config.base_url, to='') }}">{{ subchild.title }}</a></li>
                             {% endfor %}
                           </ul>
                         {% endif %}

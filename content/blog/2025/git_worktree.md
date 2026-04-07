@@ -198,4 +198,4 @@ Happy coding!
 
 ## Links
 
-**Checkout [Git-Worktree]("https://git-scm.com/docs/git-worktree").**
+**Checkout [Git-Worktree](https://git-scm.com/docs/git-worktree).**
