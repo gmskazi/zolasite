@@ -4,7 +4,7 @@
       <img src="{{ get_url(path='images/logoNTL-darkmode.png') }}" alt="{{ config.title }}" />
     </a>
 
-    <nav class="header-nav" aria-label="Main navigation">
+    <nav class="header-nav" id="primary-nav" aria-label="Main navigation">
       <ul class="main-nav">
         {% for item in config.extra.main_nav %}
           <li>
@@ -19,6 +19,20 @@
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" />
           <line x1="16.65" y1="16.65" x2="21" y2="21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        id="menu-toggle"
+        class="menu-toggle"
+        aria-label="Toggle menu"
+        aria-controls="primary-nav"
+        aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
       </button>
     </div>
