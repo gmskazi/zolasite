@@ -291,6 +291,18 @@ p {
   grid-template-columns: 1fr;
 }
 
+.home-blog {
+  background: var(--bg);
+}
+
+.home-blog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .page-header {
   padding-bottom: 0;
 }
@@ -450,6 +462,7 @@ p {
 }
 
 .site-footer {
+  background: var(--bg);
   border-top: 1px solid var(--border);
   margin-top: 2rem;
 }
@@ -558,6 +571,11 @@ p {
     display: block;
     padding: 0.45rem 0;
     text-align: center;
+  }
+
+  .home-blog-head {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .footer-top {
