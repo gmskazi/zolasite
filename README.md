@@ -1,5 +1,11 @@
 # Nakatechlabs site
 
+[![CI](https://img.shields.io/github/actions/workflow/status/gmskazi/zolasite/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/gmskazi/zolasite/actions/workflows/ci.yml)
+[![Zola](https://img.shields.io/badge/Zola-0.22.1-0f766e?style=flat-square)](https://www.getzola.org/)
+[![Node](https://img.shields.io/badge/Node-22-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Secrets](https://img.shields.io/badge/secrets-gitleaks-success?style=flat-square)](mise.toml)
+
 Custom Zola implementation for `https://nakatechlabs.com`
 
 ## Prerequisites
