@@ -626,20 +626,20 @@ Doing this will also fix the Tabs issues with aerospace.
 
 #### General
 
-|   **Command**   | **Description**                |
-| :-------------: | ------------------------------ |
-|  Ctrl+space=>d  | Detach from session            |
-|  Ctrl+space=>f  | Sessionx Session Manager                |
-|  Ctrl+space=>s  | Sesh Session Manager                |
-|  Ctrl+space=>s  | Show all sessions              |
-|  Ctrl+space=>w  | Session and Window Preview     |
-|  Ctrl+space=>(  | Move to previous session       |
-|  Ctrl+space=>)  | Move to Next session           |
-|  Ctrl+space=>c  | Create Window                  |
-|  Ctrl+space=>w  | List Windows                   |
-|  Ctrl+space=>n  | Next Window                    |
+| **Command** | **Description** |
+| :---------: | --------------- |
+| Ctrl+space=>d | Detach from session |
+| Ctrl+space=>f | Sessionx Session Manager |
+| Ctrl+space=>s | Sesh Session Manager |
+| Ctrl+space=>s | Show all sessions |
+| Ctrl+space=>w | Session and Window Preview |
+| Ctrl+space=>( | Move to previous session |
+| Ctrl+space=>) | Move to Next session |
+| Ctrl+space=>c | Create Window |
+| Ctrl+space=>w | List Windows |
+| Ctrl+space=>n | Next Window |
 | Ctrl+space=>0~9 | Switch/select window by number |
-|  Ctrl+space=>[  | Enter vi mode                  |
+| Ctrl+space=>[ | Enter vi mode |
 
 #### Panes and Navigation
 
@@ -768,9 +768,9 @@ Doing this will also fix the Tabs issues with aerospace.
 
 ## Custom Shortcuts found in zshrc
 
-| **Command** | **Description**                                |
-| :---------: | ---------------------------------------------- |
-| ll  | "ls -la --tree --git-ignore" |
+| **Command** | **Description** |
+| :---------: | --------------- |
+| ll | "ls -la --tree --git-ignore" |
 | reload | "source ~/.zshrc" |
 | brewup | "brew update && brew upgrade && brew doctor && brew cleanup" |
 | y | Yazi but also changes you to that directory when you quit |

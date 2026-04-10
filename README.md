@@ -49,3 +49,11 @@ mise run build
 ```bash
 zola build
 ```
+
+## Deployment
+
+This site is deployed to Cloudflare Pages. The `main` branch is configured to automatically deploy on push.
+
+## Security
+
+- Secret scanning is part of local and CI checks via `mise run scan:secrets`
