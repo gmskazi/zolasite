@@ -6,7 +6,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](LICENSE)
 [![Secrets](https://img.shields.io/badge/secrets-gitleaks-success?style=flat)](mise.toml)
 
-Custom Zola implementation for `https://nakatechlabs.com`
+Custom Zola implementation for `https://nakatechlabs.com` migrated from Hugo.
+
+I switched from Hugo to Zola because I wanted a simpler, more stable setup that was easier to maintain.
+Hugo updates were regularly breaking parts of my site, while Zola gives me a cleaner workflow with the modern features
+I need without as much overhead.
 
 ## Prerequisites
 
