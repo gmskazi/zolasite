@@ -1,7 +1,7 @@
 +++
-title = 'Git WorkTree - Exploring its benefits.'
-description = 'Git WorkTree - Exploring its benefits.'
-date = '2025-03-06T05:00:00Z'
+title = 'Git Worktree - Practical workflow with a central bare repo'
+description = 'A practical Git worktree setup using a central bare repo and sibling working directories.'
+date = '2026-04-12T05:00:00Z'
 draft = false
 in_search_index = true
 
@@ -14,188 +14,159 @@ image = '/images/fun.gif'
 author = 'Aito Nakajima'
 +++
 
-Git is an incredibly powerful version control system that offers various features to streamline the development process. One such feature is `git worktree`, which allows you to manage multiple working directories within a single repository. This blog will explore what `git worktree` is, how to use it, and the benefits it provides.
+`git worktree` is one of the most useful Git features once you start juggling multiple tasks at the same time. It lets you keep multiple branches checked out in separate folders, all backed by the same repository data.
+
+In this post, I will share a practical setup that I use and recommend: a **central bare repo in `.git`** with sibling worktree folders like `main/` and `feature-login/`.
 
 ## What is Git Worktree?
 
-`git worktree` is a command that lets you check out multiple branches of a single repository at the same time. Each branch can be assigned to its own working directory, allowing you to work on different branches simultaneously without switching between them. This is particularly useful for tasks such as developing new features, fixing bugs, or performing code reviews.
+`git worktree` lets you attach additional working directories to one repository. Instead of switching branches in one folder (and stashing constantly), each branch can live in its own directory.
 
-## How to Use Git Worktree
+This is useful for:
 
-Using `git worktree` is straightforward. Below are the basic commands to get you started:
+- building a feature while hotfixing production,
+- reviewing a PR without disturbing your current work,
+- experimenting safely in an isolated folder.
 
-1. **Clone a Repository as Bare**
+## Recommended directory layout
 
-   Before using `git worktree`, you can clone your repository as a bare repository. A bare repository does not have a working directory and is ideal for creating multiple worktrees. Use the following command:
-
-   ```sh
-   git clone --bare <repository-url>
-   ```
-
-   For example:
-
-   ```sh
-   git clone --bare https://github.com/user/repo.git
-   ```
-
-2. **Add a Worktree**
-
-   To add a new worktree, use the following command:
-
-   ```sh
-   git worktree add <branch>
-   ```
-
-   For example, to create a new worktree for the `feature-branch` in a directory called `feature-dir`, you would run:
-
-   ```sh
-   git worktree add feature-branch
-   ```
-
-3. **List Worktrees**
-
-   To list all the worktrees associated with your repository, use:
-
-   ```sh
-   git worktree list
-   ```
-
-4. **Remove a Worktree**
-
-   To remove a worktree, use:
-
-   ```sh
-   git worktree remove <path>
-   ```
-
-   For example:
-
-   ```sh
-   git worktree remove feature-dir
-   ```
-
-### Example workflow when using Git Worktree
-
-> Everyone has their own way of using `git worktree`. Here is an example workflow that I use when working with `git worktree`.
-
-- Clone the Bare repository.
+The layout below keeps things simple and easy to navigate:
 
 ```bash
-git clone --bare gitrepo myrepo.git
-cd myrepo.git
+$ tree -L 1
+.
+|-- .git
+|-- main
+|-- feature-login
+`-- bugfix-123
+
+4 directories, 0 files
 ```
 
-- Add a worktree for the feature branch.
+```text
+.git/            # central bare repo (metadata + objects)
+main/            # main branch worktree
+feature-login/   # feature branch worktree
+bugfix-123/      # bugfix branch worktree
+```
+
+This keeps everything in one parent directory and avoids extra nesting.
+
+## Setup from scratch
+
+### 1) Create the folder and clone as bare into `.git`
 
 ```bash
-git worktree add feature
-cd feature
+mkdir myrepo
+cd myrepo
+git clone --bare <repository-url> .git
 ```
 
-- Setup tracking immediately to push easily
+Example:
 
 ```bash
-git push --set-upstream origin feature  # Creates feature on origin
+git clone --bare git@github.com:user/repo.git .git
 ```
 
-- Make changes and Push Incrementally
+### 2) Add your main working tree
 
 ```bash
-# First change
-echo "Feature start" > feature.txt
-git add feature.txt
-git commit -m "Initial feature work"
-git push origin feature
-
-# More changes
-echo "More stuff" >> feature.txt
-git add feature.txt
-git commit -m "WIP: add more"
-git push origin feature
-
-# Fix
-echo "Fixed feature" >> feature.txt
-git add feature.txt
-git commit -m "Fix typo"
-git push origin feature
+git worktree add main main
+cd main
 ```
 
-History on origin/feature:
+Now `main/` is a normal working directory.
+
+## Daily workflow
+
+### 1) Create a feature worktree
+
+From the parent folder (`myrepo/`):
 
 ```bash
-c3d4e5f Fix typo
-a1b2c3d WIP: add more
-e4f5g6h Initial feature work
-7890abc (origin/main, main) Initial main commit
+git worktree add -b feature/login feature-login main
+cd feature-login
 ```
 
-> To avoid force-pushing after cleaning up your git history using rebase, I tend to create a new worktree for cleanup.
-
-- Create a cleanup branch
+Then set upstream on first push:
 
 ```bash
-cd ../myrepo.git
-git worktree add feature-clean
-cd feature-clean
-git pull origin feature
+git push -u origin feature/login
 ```
 
-- Clean up
+### 2) Work and commit normally
+
+Inside a worktree folder, you use regular Git commands:
 
 ```bash
-git rebase -i $(git merge-base HEAD origin/main)
-# Squash or rename commits if needed
-git push origin feature-clean  # New branch, no force needed
+git status
+git add .
+git commit -m "Add login form validation"
+git push
 ```
 
-- In Github/Gitlab Open a PR from feature-clean to main
-
-- Cleanup
+### 3) See all active worktrees
 
 ```bash
-cd ../myrepo.git
-git worktree remove feature
-git worktree remove feature-clean
-git branch -d feature feature-clean
-git push origin --delete feature feature-clean
+git worktree list
 ```
 
-## Benefits of Using Git Worktree
+### 4) Remove a worktree after merge
 
-### 1. Parallel Development
+```bash
+cd ..
+git worktree remove feature-login
+git branch -d feature/login
+git push origin --delete feature/login
+git worktree prune
+```
 
-One of the primary advantages of `git worktree` is the ability to work on multiple branches in parallel. This is especially useful when you need to switch contexts frequently or collaborate with other team members on different features or bug fixes.
+## Why this works well
 
-### 2. Efficient Resource Usage
+### Parallel work without context switching pain
 
-Unlike cloning the repository multiple times, using `git worktree` shares the same repository data, reducing disk space usage. This makes it a more efficient way to manage multiple working directories.
+You can keep unrelated tasks open in separate folders instead of constantly switching branches in one directory.
 
-### 3. Simplified Workflow
+### Shared Git data, less disk usage
 
-With `git worktree`, you can easily switch between branches without the need to stash or commit unfinished work. This simplifies your workflow and reduces the risk of losing changes.
+Worktrees share Git objects, so this is lighter than cloning the same repository multiple times.
 
-### 4. No Need for Stashing
+### Cleaner day-to-day flow
 
-When using `git worktree`, you don't need to use `git stash` anymore. Since you can maintain separate working directories for different branches, there is no need to stash your changes to switch branches. This makes your work process smoother and more efficient.
+You usually do not need to stash just to switch tasks, because each task already has its own working directory.
 
-### 5. Enhanced Code Reviews
+### Better review and testing isolation
 
-When performing code reviews, you can create a separate worktree for the branch under review. This allows you to review the code in isolation without affecting your main working directory.
+You can open a review branch or experiment branch in a separate folder without affecting your current feature work.
 
-### 6. Better Context Switching
+## Common mistakes to avoid
 
-Developers often need to switch between tasks quickly. `git worktree` allows you to maintain different branches in separate directories, enabling you to switch contexts seamlessly without disrupting your workflow.
+1. Running `git worktree add <branch>` without a path.
 
-### 7. Improved Experimentation
+Use both path and branch intent explicitly, for example:
 
-If you want to experiment with a new idea or feature, you can create a separate worktree for it. This way, you can test your changes in isolation without risking the stability of your main branch.
+```bash
+git worktree add -b feature/x feature-x main
+```
+
+2. Saying "you never need stash anymore."
+
+Worktrees reduce stash usage a lot, but stash can still be useful in some scenarios.
+
+3. Forgetting to prune stale metadata after manual cleanup.
+
+Use:
+
+```bash
+git worktree prune
+```
 
 ## Conclusion
 
-`git worktree` is a powerful feature that enhances the flexibility and efficiency of your Git workflow. By allowing you to manage multiple working directories within a single repository, it simplifies parallel development, context switching, and resource usage. Whether you're a solo developer or part of a larger team, incorporating `git worktree` into your workflow can significantly improve your productivity and streamline your development process.
+`git worktree` is a big productivity boost once your work involves parallel tasks. The central bare repo approach (`.git` + sibling worktree folders) keeps the setup simple, fast, and easy to reason about.
 
-Happy coding!
+If you have never tried this layout, start with `main/` plus one feature folder and expand from there.
 
-## Links
+## Link
 
-**Checkout [Git-Worktree](https://git-scm.com/docs/git-worktree).**
+- [git worktree official documentation](https://git-scm.com/docs/git-worktree)
