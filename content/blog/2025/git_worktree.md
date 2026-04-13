@@ -149,11 +149,11 @@ Use both path and branch intent explicitly, for example:
 git worktree add -b feature/x feature-x main
 ```
 
-2. Saying "you never need stash anymore."
+1. Saying "you never need stash anymore."
 
 Worktrees reduce stash usage a lot, but stash can still be useful in some scenarios.
 
-3. Forgetting to prune stale metadata after manual cleanup.
+1. Forgetting to prune stale metadata after manual cleanup.
 
 Use:
 
