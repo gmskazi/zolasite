@@ -6,24 +6,25 @@
     </a>
   {% endif %}
 
-  <h3><a href="{{ page_href }}">{{ page.title }}</a></h3>
+  {% if page.taxonomies.categories %}
+    <div class="card-categories">
+      {% for category in page.taxonomies.categories %}
+        <a href="{{ get_taxonomy_url(kind='categories', name=category) | replace(from=config.base_url, to='') }}">{{ category }}</a>
+      {% endfor %}
+    </div>
+  {% endif %}
 
-  <p class="meta">
+  <h3 class="post-card-title"><a href="{{ page_href }}">{{ page.title }}</a></h3>
+
+  <p class="meta card-meta">
     {% if page.extra.author %}{{ page.extra.author }} · {% endif %}
     {{ page.date | date(format="%B %-d, %Y") }}
+    {% if page.reading_time %} · {{ page.reading_time }} min read{% endif %}
   </p>
 
-  {% if page.taxonomies.categories %}
-    <p class="meta">
-      {% for category in page.taxonomies.categories %}
-        <a href="{{ get_taxonomy_url(kind='categories', name=category) | replace(from=config.base_url, to='') }}">{{ category }}</a>{% if not loop.last %}, {% endif %}
-      {% endfor %}
-    </p>
-  {% endif %}
-
   {% if page.summary %}
-    <p>{{ page.summary | striptags }}</p>
+    <p class="card-summary">{{ page.summary | striptags }}</p>
   {% endif %}
 
-  <a class="btn btn-link" href="{{ page_href }}">Read more</a>
+  <a class="btn btn-link" href="{{ page_href }}">Read article</a>
 </article>

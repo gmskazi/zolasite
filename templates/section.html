@@ -3,16 +3,28 @@
 {% block title %}{{ section.title }} | {{ config.title }}{% endblock title %}
 
 {% block content %}
-  <section class="section page-header">
-    <div class="container">
+  <section class="section page-header page-header--blog">
+    <div class="container container--wide">
+      <p class="eyebrow">Archive</p>
       <h1>{{ section.title }}</h1>
+      {% if section.description %}
+        <p class="page-lead">{{ section.description }}</p>
+      {% endif %}
+
+      <div class="archive-toolbar" aria-label="Archive overview">
+        <p class="archive-metric">{{ section.pages | length }} posts published</p>
+        {% if section.subsections and section.subsections | length > 0 %}
+          <p class="archive-metric">{{ section.subsections | length }} sub-sections</p>
+        {% endif %}
+      </div>
+
       {% set current = section.title %}
       {% include "partials/breadcrumbs.html" %}
     </div>
   </section>
 
   <section class="section posts-wrap">
-    <div class="container posts-layout">
+    <div class="container container--wide posts-layout">
       <div>
         <div class="post-grid">
           {% if paginator is defined %}
@@ -29,11 +41,11 @@
         {% if paginator is defined and paginator.number_pagers > 1 %}
           <nav class="pager" aria-label="Pagination">
             {% if paginator.previous %}
-              <a href="{{ paginator.previous }}">Previous</a>
+              <a class="btn btn-link" href="{{ paginator.previous }}">Previous</a>
             {% endif %}
-            <span>Page {{ paginator.current_index }} of {{ paginator.number_pagers }}</span>
+            <span class="pager-count">Page {{ paginator.current_index }} of {{ paginator.number_pagers }}</span>
             {% if paginator.next %}
-              <a href="{{ paginator.next }}">Next</a>
+              <a class="btn btn-link" href="{{ paginator.next }}">Next</a>
             {% endif %}
           </nav>
         {% endif %}

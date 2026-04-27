@@ -1,51 +1,96 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="hero section">
-    <div class="container hero-copy">
-      <h1>{{ section.extra.banner.title }}</h1>
-      <p>{{ section.extra.banner.content }}</p>
-      {% if section.extra.banner.button.enable %}
-        <a class="btn" href="{{ section.extra.banner.button.link }}">{{ section.extra.banner.button.label }}</a>
-      {% endif %}
-    </div>
-    <div class="container hero-media">
-      <img src="{{ section.extra.banner.image }}" alt="Banner image" />
-    </div>
-  </section>
+  {% set blog_section = get_section(path="blog/_index.md") %}
 
-  {% for feature in section.extra.features %}
-    <section class="section feature-row">
-      <div class="container feature-grid">
-        <div>
-          <img src="{{ feature.image }}" alt="{{ feature.title }}" />
+  <div class="home-page">
+    <section class="hero section">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <h1>{{ section.extra.banner.title }}</h1>
+          <p>{{ section.extra.banner.content }}</p>
+          <div class="hero-cta-group">
+            {% if section.extra.banner.button.enable %}
+              <a class="btn" href="{{ section.extra.banner.button.link }}">{{ section.extra.banner.button.label }}</a>
+            {% endif %}
+          </div>
+          <div class="hero-proof" aria-label="Site highlights">
+            <span>Hands-on guides</span>
+            <span>{{ blog_section.pages | length }} posts</span>
+            <span>Updated regularly</span>
+          </div>
         </div>
-        <div>
-          <h2>{{ feature.title }}</h2>
-          <p>{{ feature.content }}</p>
-          {% if feature.button.enable %}
-            <a class="btn" href="{{ feature.button.link }}">{{ feature.button.label }}</a>
+
+        {% if blog_section and blog_section.pages | length > 0 %}
+          <aside class="hero-rail" aria-label="Fresh highlights">
+            <div class="hero-rail-head">
+              <p class="eyebrow">Fresh</p>
+              <h2>Start Here</h2>
+            </div>
+            <ol class="hero-rail-list">
+              {% for page in blog_section.pages | slice(end=4) %}
+                {% set page_href = page.permalink | replace(from=config.base_url, to="") %}
+                <li class="hero-rail-item">
+                  {% if page.taxonomies.categories and page.taxonomies.categories | length > 0 %}
+                    <p class="hero-rail-kicker">{{ page.taxonomies.categories | first }}</p>
+                  {% else %}
+                    <p class="hero-rail-kicker">Post</p>
+                  {% endif %}
+                  <a href="{{ page_href }}">{{ page.title }}</a>
+                  <p class="hero-rail-meta">{{ page.date | date(format="%b %-d, %Y") }}</p>
+                </li>
+              {% endfor %}
+            </ol>
+          </aside>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="section feature-row">
+      <div class="container">
+        <div class="section-title-wrap">
+          <p class="eyebrow">Featured</p>
+          {% if section.extra.features and section.extra.features | length == 1 %}
+            <h2>{{ section.extra.features[0].title }}</h2>
+          {% else %}
+            <h2>What I'm Building and Sharing</h2>
           {% endif %}
         </div>
+        {% for feature in section.extra.features %}
+          <article class="feature-grid feature-card {% if loop.index is even %}is-reversed{% endif %}">
+            <div class="feature-media">
+              <img src="{{ feature.image }}" alt="{{ feature.title }}" />
+            </div>
+            <div class="feature-copy">
+              <h3>{{ feature.title }}</h3>
+              <p>{{ feature.content }}</p>
+              {% if feature.button.enable %}
+                <a class="btn" href="{{ feature.button.link }}">{{ feature.button.label }}</a>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
       </div>
     </section>
-  {% endfor %}
 
-  {% set blog_section = get_section(path="blog/_index.md") %}
-  {% if blog_section and blog_section.pages | length > 0 %}
-    <section class="section home-blog">
-      <div class="container">
-        <div class="home-blog-head">
-          <h2>Latest Blog Posts</h2>
-          <a class="btn btn-link" href="/blog/">View all posts</a>
-        </div>
+    {% if blog_section and blog_section.pages | length > 0 %}
+      <section class="section home-blog">
+        <div class="container">
+          <div class="home-blog-head">
+            <div>
+              <p class="eyebrow">Latest</p>
+              <h2>Latest Posts</h2>
+            </div>
+            <a class="btn btn-link" href="/blog/">View all posts</a>
+          </div>
 
-        <div class="post-grid">
-          {% for page in blog_section.pages | slice(end=2) %}
-            {% include "partials/blog_card.html" %}
-          {% endfor %}
+          <div class="post-grid">
+            {% for page in blog_section.pages | slice(end=3) %}
+              {% include "partials/blog_card.html" %}
+            {% endfor %}
+          </div>
         </div>
-      </div>
-    </section>
-  {% endif %}
+      </section>
+    {% endif %}
+  </div>
 {% endblock content %}

@@ -5,61 +5,78 @@
 
 {% block content %}
   <section class="section post-single">
-    <div class="container">
+    <div class="container container--wide">
+      {% set current = page.title %}
+      {% include "partials/breadcrumbs.html" %}
+
       {% if page.extra.image %}
         <img class="post-hero" src="{{ page.extra.image }}" alt="{{ page.title }}" />
       {% endif %}
 
-      <h1>{{ page.title }}</h1>
+      <div class="post-heading">
+        <p class="eyebrow">Article</p>
+        <h1>{{ page.title }}</h1>
+        {% if page.description %}
+          <p class="post-dek">{{ page.description }}</p>
+        {% endif %}
+      </div>
 
-      <p class="meta">
-        {% if page.extra.author %}{{ page.extra.author }} · {% endif %}
-        {{ page.date | date(format="%B %-d, %Y") }}
-      </p>
+      <div class="post-layout">
+        <aside class="post-meta-column">
+          <div class="post-meta-panel">
+            <p class="meta">
+              {% if page.extra.author %}{{ page.extra.author }} · {% endif %}
+              {{ page.date | date(format="%B %-d, %Y") }}
+              {% if page.reading_time %} · {{ page.reading_time }} min read{% endif %}
+            </p>
 
-      {% if page.taxonomies.categories %}
-        <p class="meta">
-          {% for category in page.taxonomies.categories %}
-            <a href="{{ get_taxonomy_url(kind='categories', name=category) | replace(from=config.base_url, to='') }}">{{ category }}</a>{% if not loop.last %}, {% endif %}
-          {% endfor %}
-        </p>
-      {% endif %}
+            {% if page.taxonomies.categories %}
+              <div class="meta-label">Categories</div>
+              <div class="meta meta-links">
+                {% for category in page.taxonomies.categories %}
+                  <a href="{{ get_taxonomy_url(kind='categories', name=category) | replace(from=config.base_url, to='') }}">{{ category }}</a>
+                {% endfor %}
+              </div>
+            {% endif %}
 
-      {% if page.toc and page.toc | length > 0 %}
-        <details class="toc toc-collapsible">
-          <summary>Contents</summary>
-          <ul>
-            {% for heading in page.toc %}
-              <li>
-                <a href="{{ heading.permalink | replace(from=config.base_url, to='') }}">{{ heading.title }}</a>
-                {% if heading.children and heading.children | length > 0 %}
-                  <ul>
-                    {% for child in heading.children %}
-                      <li>
-                        <a href="{{ child.permalink | replace(from=config.base_url, to='') }}">{{ child.title }}</a>
-                        {% if child.children and child.children | length > 0 %}
-                          <ul>
-                            {% for subchild in child.children %}
-                              <li><a href="{{ subchild.permalink | replace(from=config.base_url, to='') }}">{{ subchild.title }}</a></li>
-                            {% endfor %}
-                          </ul>
-                        {% endif %}
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-        </details>
-      {% endif %}
+            {% if page.toc and page.toc | length > 0 %}
+              <details class="toc toc-collapsible" open>
+                <summary>Contents</summary>
+                <ul>
+                  {% for heading in page.toc %}
+                    <li>
+                      <a href="{{ heading.permalink | replace(from=config.base_url, to='') }}">{{ heading.title }}</a>
+                      {% if heading.children and heading.children | length > 0 %}
+                        <ul>
+                          {% for child in heading.children %}
+                            <li>
+                              <a href="{{ child.permalink | replace(from=config.base_url, to='') }}">{{ child.title }}</a>
+                              {% if child.children and child.children | length > 0 %}
+                                <ul>
+                                  {% for subchild in child.children %}
+                                    <li><a href="{{ subchild.permalink | replace(from=config.base_url, to='') }}">{{ subchild.title }}</a></li>
+                                  {% endfor %}
+                                </ul>
+                              {% endif %}
+                            </li>
+                          {% endfor %}
+                        </ul>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </details>
+            {% endif %}
+          </div>
+        </aside>
 
-      <article class="content">{{ page.content | safe }}</article>
+        <article class="content post-content">{{ page.content | safe }}</article>
+      </div>
 
       {% if page.taxonomies.tags %}
-        <div class="tag-list">
+        <div class="tag-list post-tags">
           {% for tag in page.taxonomies.tags %}
-            <a href="{{ get_taxonomy_url(kind='tags', name=tag) | replace(from=config.base_url, to='') }}">{{ tag }}</a>
+            <a href="{{ get_taxonomy_url(kind='tags', name=tag) | replace(from=config.base_url, to='') }}">#{{ tag }}</a>
           {% endfor %}
         </div>
       {% endif %}

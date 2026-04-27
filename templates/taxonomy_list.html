@@ -3,17 +3,24 @@
 {% block title %}{{ taxonomy.name | title }} | {{ config.title }}{% endblock title %}
 
 {% block content %}
-  <section class="section page-header">
-    <div class="container">
+  <section class="section page-header page-header--blog">
+    <div class="container container--wide">
+      <p class="eyebrow">Taxonomy</p>
       <h1>{{ taxonomy.name | title }}</h1>
+      <p class="page-lead">Browse {{ terms | length }} {{ taxonomy.name | lower }} and jump into focused topic pages.</p>
     </div>
   </section>
 
   <section class="section">
-    <div class="container">
+    <div class="container container--wide">
         <ul class="term-list">
           {% for term in terms %}
-          <li><a href="{{ term.permalink | replace(from=config.base_url, to='') }}">{{ term.name }} ({{ term.pages | length }})</a></li>
+          <li>
+            <a href="{{ term.permalink | replace(from=config.base_url, to='') }}">
+              <span>{{ term.name }}</span>
+              <span class="term-count">{{ term.pages | length }}</span>
+            </a>
+          </li>
           {% endfor %}
         </ul>
       </div>

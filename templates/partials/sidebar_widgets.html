@@ -1,11 +1,11 @@
 {% set categories = get_taxonomy(kind="categories") %}
 {% if categories.items %}
   <section class="widget">
-    <h4>Categories</h4>
+    <h4 class="widget-title">Categories</h4>
     <ul>
       {% for term in categories.items %}
         <li>
-          <a href="{{ term.permalink | replace(from=config.base_url, to='') }}">{{ term.name }} ({{ term.pages | length }})</a>
+          <a href="{{ term.permalink | replace(from=config.base_url, to='') }}">{{ term.name }}<span>{{ term.pages | length }}</span></a>
         </li>
       {% endfor %}
     </ul>
@@ -15,7 +15,7 @@
 {% set tags = get_taxonomy(kind="tags") %}
 {% if tags.items %}
   <section class="widget">
-    <h4>Tags</h4>
+    <h4 class="widget-title">Tags</h4>
     <div class="tag-list">
       {% for term in tags.items %}
         <a href="{{ term.permalink | replace(from=config.base_url, to='') }}">{{ term.name }}</a>

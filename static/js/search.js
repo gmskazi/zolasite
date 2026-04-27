@@ -12,6 +12,7 @@
   const rawIndex = window.searchIndex;
   const loadedIndex =
     rawIndex && window.elasticlunr ? elasticlunr.Index.load(rawIndex) : null;
+  let previousActiveElement = null;
 
   if (!loadedIndex) {
     return;
@@ -20,16 +21,25 @@
   const docs = (loadedIndex.documentStore && loadedIndex.documentStore.docs) || {};
 
   function openSearch() {
+    previousActiveElement = document.activeElement;
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
+    openBtn.setAttribute("aria-expanded", "true");
+    document.body.classList.add("has-modal-open");
     input.focus();
   }
 
   function closeSearch() {
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
+    openBtn.setAttribute("aria-expanded", "false");
+    document.body.classList.remove("has-modal-open");
     input.value = "";
     results.innerHTML = "";
+
+    if (previousActiveElement && typeof previousActiveElement.focus === "function") {
+      previousActiveElement.focus();
+    }
   }
 
   function renderResults(matches) {
@@ -79,6 +89,13 @@
 
   closeButtons.forEach((button) => {
     button.addEventListener("click", closeSearch);
+  });
+
+  results.addEventListener("click", function (event) {
+    const target = event.target.closest("a");
+    if (target) {
+      closeSearch();
+    }
   });
 
   input.addEventListener("input", function () {

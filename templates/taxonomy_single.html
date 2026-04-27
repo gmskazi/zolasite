@@ -3,17 +3,26 @@
 {% block title %}{{ term.name }} | {{ config.title }}{% endblock title %}
 
 {% block content %}
-  <section class="section page-header">
-    <div class="container">
+  <section class="section page-header page-header--blog">
+    <div class="container container--wide">
+      <p class="eyebrow">Filtered View</p>
       <h1>{{ term.name }}</h1>
+      <p class="page-lead">{{ term.pages | length }} posts tagged under this topic.</p>
+      {% set current = term.name %}
+      {% include "partials/breadcrumbs.html" %}
     </div>
   </section>
 
-  <section class="section">
-    <div class="container post-grid">
-      {% for page in term.pages %}
-        {% include "partials/blog_card.html" %}
-      {% endfor %}
+  <section class="section posts-wrap">
+    <div class="container container--wide posts-layout">
+      <div class="post-grid taxonomy-grid">
+        {% for page in term.pages %}
+          {% include "partials/blog_card.html" %}
+        {% endfor %}
+      </div>
+      <aside class="sidebar">
+        {% include "partials/sidebar_widgets.html" %}
+      </aside>
     </div>
   </section>
 {% endblock content %}
