@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>graphify - graphify-out/graph.html</title>
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f0f1a; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; display: flex; height: 100vh; overflow: hidden; }
+  #graph { flex: 1; }
+  #sidebar { width: 280px; background: #1a1a2e; border-left: 1px solid #2a2a4e; display: flex; flex-direction: column; overflow: hidden; }
+  #search-wrap { padding: 12px; border-bottom: 1px solid #2a2a4e; }
+  #search { width: 100%; background: #0f0f1a; border: 1px solid #3a3a5e; color: #e0e0e0; padding: 7px 10px; border-radius: 6px; font-size: 13px; outline: none; }
+  #search:focus { border-color: #4E79A7; }
+  #search-results { max-height: 140px; overflow-y: auto; padding: 4px 12px; border-bottom: 1px solid #2a2a4e; display: none; }
+  .search-item { padding: 4px 6px; cursor: pointer; border-radius: 4px; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .search-item:hover { background: #2a2a4e; }
+  #info-panel { padding: 14px; border-bottom: 1px solid #2a2a4e; min-height: 140px; }
+  #info-panel h3 { font-size: 13px; color: #aaa; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  #info-content { font-size: 13px; color: #ccc; line-height: 1.6; }
+  #info-content .field { margin-bottom: 5px; }
+  #info-content .field b { color: #e0e0e0; }
+  #info-content .empty { color: #555; font-style: italic; }
+  .neighbor-link { display: block; padding: 2px 6px; margin: 2px 0; border-radius: 3px; cursor: pointer; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-left: 3px solid #333; }
+  .neighbor-link:hover { background: #2a2a4e; }
+  #neighbors-list { max-height: 160px; overflow-y: auto; margin-top: 4px; }
+  #legend-wrap { flex: 1; overflow-y: auto; padding: 12px; }
+  #legend-wrap h3 { font-size: 13px; color: #aaa; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .legend-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; border-radius: 4px; font-size: 12px; }
+  .legend-item:hover { background: #2a2a4e; padding-left: 4px; }
+  .legend-item.dimmed { opacity: 0.35; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legend-count { color: #666; font-size: 11px; }
+  #stats { padding: 10px 14px; border-top: 1px solid #2a2a4e; font-size: 11px; color: #555; }
+  #legend-controls { display: flex; gap: 6px; margin-bottom: 8px; }
+  #legend-controls button { flex: 1; background: #0f0f1a; border: 1px solid #3a3a5e; color: #aaa; padding: 4px 0; border-radius: 4px; font-size: 11px; cursor: pointer; }
+  #legend-controls button:hover { border-color: #4E79A7; color: #e0e0e0; }
+</style>
+</head>
+<body>
+<div id="graph"></div>
+<div id="sidebar">
+  <div id="search-wrap">
+    <input id="search" type="text" placeholder="Search nodes..." autocomplete="off">
+    <div id="search-results"></div>
+  </div>
+  <div id="info-panel">
+    <h3>Node Info</h3>
+    <div id="info-content"><span class="empty">Click a node to inspect it</span></div>
+  </div>
+  <div id="legend-wrap">
+    <h3>Communities</h3>
+    <div id="legend-controls">
+      <button onclick="toggleAllCommunities(false)">Show All</button>
+      <button onclick="toggleAllCommunities(true)">Hide All</button>
+    </div>
+    <div id="legend"></div>
+  </div>
+  <div id="stats">44 nodes &middot; 60 edges &middot; 10 communities</div>
+</div>
+<script>
+const RAW_NODES = [{"id": "header_js", "label": "header.js", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "header.js", "community": 7, "community_name": "Header Menu Script", "source_file": "header.js", "file_type": "code", "degree": 1}, {"id": "js_header_setmenuopen", "label": "setMenuOpen()", "color": {"background": "#FF9DA7", "border": "#FF9DA7", "highlight": {"background": "#ffffff", "border": "#FF9DA7"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "setMenuOpen()", "community": 7, "community_name": "Header Menu Script", "source_file": "header.js", "file_type": "code", "degree": 1}, {"id": "search_js", "label": "search.js", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "search.js", "community": 3, "community_name": "Search Script Flow", "source_file": "search.js", "file_type": "code", "degree": 3}, {"id": "js_search_opensearch", "label": "openSearch()", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "openSearch()", "community": 3, "community_name": "Search Script Flow", "source_file": "search.js", "file_type": "code", "degree": 1}, {"id": "js_search_closesearch", "label": "closeSearch()", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "closeSearch()", "community": 3, "community_name": "Search Script Flow", "source_file": "search.js", "file_type": "code", "degree": 1}, {"id": "js_search_renderresults", "label": "renderResults()", "color": {"background": "#76B7B2", "border": "#76B7B2", "highlight": {"background": "#ffffff", "border": "#76B7B2"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "renderResults()", "community": 3, "community_name": "Search Script Flow", "source_file": "search.js", "file_type": "code", "degree": 1}, {"id": "readme", "label": "Project README", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Project README", "community": 4, "community_name": "Homepage Content Feed", "source_file": "/Users/aitonakajima/github/zolasite/README.md", "file_type": "markdown", "degree": 1}, {"id": "design-md", "label": "Design System Guide", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 15.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Design System Guide", "community": 9, "community_name": "Agent Design Policy", "source_file": "/Users/aitonakajima/github/zolasite/DESIGN.md", "file_type": "markdown", "degree": 2}, {"id": "agents-md", "label": "Agent Instructions", "color": {"background": "#BAB0AC", "border": "#BAB0AC", "highlight": {"background": "#ffffff", "border": "#BAB0AC"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Agent Instructions", "community": 9, "community_name": "Agent Design Policy", "source_file": "/Users/aitonakajima/github/zolasite/AGENTS.md", "file_type": "markdown", "degree": 1}, {"id": "content-home", "label": "Home Content Front Matter", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 15.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Home Content Front Matter", "community": 4, "community_name": "Homepage Content Feed", "source_file": "/Users/aitonakajima/github/zolasite/content/_index.md", "file_type": "markdown", "degree": 2}, {"id": "blog-section-index", "label": "Blog Section Index", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 37.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Blog Section Index", "community": 4, "community_name": "Homepage Content Feed", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/_index.md", "file_type": "markdown", "degree": 11}, {"id": "blog-2024-index", "label": "2024 Archive Index", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 22.5, "font": {"size": 12, "color": "#ffffff"}, "title": "2024 Archive Index", "community": 1, "community_name": "2024 CLI Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2024/_index.md", "file_type": "markdown", "degree": 5}, {"id": "blog-2025-index", "label": "2025 Archive Index", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "2025 Archive Index", "community": 6, "community_name": "2025 Workflow Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2025/_index.md", "file_type": "markdown", "degree": 3}, {"id": "blog-2026-index", "label": "2026 Archive Index", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "2026 Archive Index", "community": 5, "community_name": "General Utility Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2026/_index.md", "file_type": "markdown", "degree": 1}, {"id": "post-cheatsheet", "label": "Post: Cheatsheet", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: Cheatsheet", "community": 8, "community_name": "Cheatsheet Assets", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2025/cheatsheet.md", "file_type": "markdown", "degree": 4}, {"id": "post-python-virtualenv", "label": "Post: Python Virtualenv on macOS", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: Python Virtualenv on macOS", "community": 6, "community_name": "2025 Workflow Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2025/python_virtualenv.md", "file_type": "markdown", "degree": 3}, {"id": "post-git-worktree", "label": "Post: Git Worktree", "color": {"background": "#B07AA1", "border": "#B07AA1", "highlight": {"background": "#ffffff", "border": "#B07AA1"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: Git Worktree", "community": 6, "community_name": "2025 Workflow Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2025/git_worktree.md", "file_type": "markdown", "degree": 3}, {"id": "post-cloudflare", "label": "Post: Cloudflare Free Services", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: Cloudflare Free Services", "community": 1, "community_name": "2024 CLI Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2024/cloudflare_features.md", "file_type": "markdown", "degree": 3}, {"id": "post-bat", "label": "Post: Bat Better Cat", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: Bat Better Cat", "community": 1, "community_name": "2024 CLI Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2024/bat_better_cat.md", "file_type": "markdown", "degree": 3}, {"id": "post-eza", "label": "Post: Eza Better ls", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: Eza Better ls", "community": 1, "community_name": "2024 CLI Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2024/eza_better_ls.md", "file_type": "markdown", "degree": 3}, {"id": "post-zoxide", "label": "Post: Zoxide Better cd", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: Zoxide Better cd", "community": 1, "community_name": "2024 CLI Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2024/zoxide_better_cd.md", "file_type": "markdown", "degree": 3}, {"id": "post-tmux", "label": "Post: tmux workflow", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: tmux workflow", "community": 5, "community_name": "General Utility Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2024/tmux.md", "file_type": "markdown", "degree": 3}, {"id": "post-mise", "label": "Post: Getting Started with mise", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Post: Getting Started with mise", "community": 5, "community_name": "General Utility Posts", "source_file": "/Users/aitonakajima/github/zolasite/content/blog/2026/getting_started_with_mise.md", "file_type": "markdown", "degree": 3}, {"id": "tpl-base", "label": "Template: base.html", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 40.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Template: base.html", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/templates/base.html", "file_type": "template", "degree": 12}, {"id": "tpl-index", "label": "Template: index.html", "color": {"background": "#59A14F", "border": "#59A14F", "highlight": {"background": "#ffffff", "border": "#59A14F"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Template: index.html", "community": 4, "community_name": "Homepage Content Feed", "source_file": "/Users/aitonakajima/github/zolasite/templates/index.html", "file_type": "template", "degree": 4}, {"id": "tpl-page", "label": "Template: page.html", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 15.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Template: page.html", "community": 2, "community_name": "Content Page Layouts", "source_file": "/Users/aitonakajima/github/zolasite/templates/page.html", "file_type": "template", "degree": 2}, {"id": "tpl-section", "label": "Template: section.html", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Template: section.html", "community": 2, "community_name": "Content Page Layouts", "source_file": "/Users/aitonakajima/github/zolasite/templates/section.html", "file_type": "template", "degree": 4}, {"id": "tpl-taxonomy-list", "label": "Template: taxonomy_list.html", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 15.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Template: taxonomy_list.html", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/templates/taxonomy_list.html", "file_type": "template", "degree": 2}, {"id": "tpl-taxonomy-single", "label": "Template: taxonomy_single.html", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 20.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Template: taxonomy_single.html", "community": 2, "community_name": "Content Page Layouts", "source_file": "/Users/aitonakajima/github/zolasite/templates/taxonomy_single.html", "file_type": "template", "degree": 4}, {"id": "partial-header", "label": "Partial: header", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 15.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Partial: header", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/templates/partials/header.html", "file_type": "template", "degree": 2}, {"id": "partial-footer", "label": "Partial: footer", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 15.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Partial: footer", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/templates/partials/footer.html", "file_type": "template", "degree": 2}, {"id": "partial-search-modal", "label": "Partial: search modal", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Partial: search modal", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/templates/partials/search_modal.html", "file_type": "template", "degree": 1}, {"id": "partial-blog-card", "label": "Partial: blog card", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Partial: blog card", "community": 2, "community_name": "Content Page Layouts", "source_file": "/Users/aitonakajima/github/zolasite/templates/partials/blog_card.html", "file_type": "template", "degree": 3}, {"id": "partial-breadcrumbs", "label": "Partial: breadcrumbs", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Partial: breadcrumbs", "community": 2, "community_name": "Content Page Layouts", "source_file": "/Users/aitonakajima/github/zolasite/templates/partials/breadcrumbs.html", "file_type": "template", "degree": 3}, {"id": "partial-sidebar-widgets", "label": "Partial: sidebar widgets", "color": {"background": "#E15759", "border": "#E15759", "highlight": {"background": "#ffffff", "border": "#E15759"}}, "size": 17.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Partial: sidebar widgets", "community": 2, "community_name": "Content Page Layouts", "source_file": "/Users/aitonakajima/github/zolasite/templates/partials/sidebar_widgets.html", "file_type": "template", "degree": 3}, {"id": "js-header", "label": "Client Script: header navigation", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Client Script: header navigation", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/static/js/header.js", "file_type": "javascript", "degree": 1}, {"id": "js-search", "label": "Client Script: search interactions", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Client Script: search interactions", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/static/js/search.js", "file_type": "javascript", "degree": 1}, {"id": "img-fun-gif", "label": "Image: fun.gif", "color": {"background": "#EDC948", "border": "#EDC948", "highlight": {"background": "#ffffff", "border": "#EDC948"}}, "size": 27.5, "font": {"size": 12, "color": "#ffffff"}, "title": "Image: fun.gif", "community": 5, "community_name": "General Utility Posts", "source_file": "/Users/aitonakajima/github/zolasite/static/images/fun.gif", "file_type": "image", "degree": 7}, {"id": "img-bat-gif", "label": "Image: bat.gif", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Image: bat.gif", "community": 1, "community_name": "2024 CLI Posts", "source_file": "/Users/aitonakajima/github/zolasite/static/images/bat.gif", "file_type": "image", "degree": 1}, {"id": "img-eza-gif", "label": "Image: eza.gif", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Image: eza.gif", "community": 1, "community_name": "2024 CLI Posts", "source_file": "/Users/aitonakajima/github/zolasite/static/images/eza.gif", "file_type": "image", "degree": 1}, {"id": "img-zoxide-gif", "label": "Image: zoxide.gif", "color": {"background": "#F28E2B", "border": "#F28E2B", "highlight": {"background": "#ffffff", "border": "#F28E2B"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Image: zoxide.gif", "community": 1, "community_name": "2024 CLI Posts", "source_file": "/Users/aitonakajima/github/zolasite/static/images/zoxide.gif", "file_type": "image", "degree": 1}, {"id": "img-lazyvim-png", "label": "Image: lazyvim screenshot", "color": {"background": "#9C755F", "border": "#9C755F", "highlight": {"background": "#ffffff", "border": "#9C755F"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Image: lazyvim screenshot", "community": 8, "community_name": "Cheatsheet Assets", "source_file": "/Users/aitonakajima/github/zolasite/static/images/2025/lazyvim.png", "file_type": "image", "degree": 1}, {"id": "img-logo-dark", "label": "Image: logo darkmode", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 15.0, "font": {"size": 12, "color": "#ffffff"}, "title": "Image: logo darkmode", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/static/images/logoNTL-darkmode.png", "file_type": "image", "degree": 2}, {"id": "img-favicon", "label": "Image: favicon", "color": {"background": "#4E79A7", "border": "#4E79A7", "highlight": {"background": "#ffffff", "border": "#4E79A7"}}, "size": 12.5, "font": {"size": 0, "color": "#ffffff"}, "title": "Image: favicon", "community": 0, "community_name": "Base Layout Shell", "source_file": "/Users/aitonakajima/github/zolasite/static/images/favicon.png", "file_type": "image", "degree": 1}];
+const RAW_EDGES = [{"from": "header_js", "to": "js_header_setmenuopen", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "search_js", "to": "js_search_opensearch", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "search_js", "to": "js_search_closesearch", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "search_js", "to": "js_search_renderresults", "label": "contains", "title": "contains [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "readme", "to": "blog-section-index", "label": "DESCRIBES_CONTENT_STRUCTURE", "title": "DESCRIBES_CONTENT_STRUCTURE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "design-md", "to": "agents-md", "label": "DECLARES_SINGLE_SOURCE_OF_TRUTH", "title": "DECLARES_SINGLE_SOURCE_OF_TRUTH [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "design-md", "to": "tpl-base", "label": "GOVERNS_VISUAL_LANGUAGE", "title": "GOVERNS_VISUAL_LANGUAGE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "content-home", "to": "img-fun-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "content-home", "to": "tpl-index", "label": "USES_SECTION_EXTRA_BANNER", "title": "USES_SECTION_EXTRA_BANNER [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "blog-section-index", "to": "tpl-index", "label": "QUERIES_SECTION", "title": "QUERIES_SECTION [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "blog-section-index", "to": "post-cheatsheet", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-section-index", "to": "post-python-virtualenv", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-section-index", "to": "post-git-worktree", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-section-index", "to": "post-cloudflare", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-section-index", "to": "post-bat", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-section-index", "to": "post-eza", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-section-index", "to": "post-zoxide", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-section-index", "to": "post-tmux", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-section-index", "to": "post-mise", "label": "MEMBER_OF_BLOG_SECTION", "title": "MEMBER_OF_BLOG_SECTION [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2024-index", "to": "post-cloudflare", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2024-index", "to": "post-bat", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2024-index", "to": "post-eza", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2024-index", "to": "post-zoxide", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2024-index", "to": "post-tmux", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2025-index", "to": "post-cheatsheet", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2025-index", "to": "post-python-virtualenv", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2025-index", "to": "post-git-worktree", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "blog-2026-index", "to": "post-mise", "label": "BELONGS_TO_ARCHIVE", "title": "BELONGS_TO_ARCHIVE [INFERRED]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "INFERRED"}, {"from": "post-cheatsheet", "to": "img-fun-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-cheatsheet", "to": "img-lazyvim-png", "label": "EMBEDS_IMAGE_IN_BODY", "title": "EMBEDS_IMAGE_IN_BODY [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-python-virtualenv", "to": "img-fun-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-git-worktree", "to": "img-fun-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-cloudflare", "to": "img-fun-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-bat", "to": "img-bat-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-eza", "to": "img-eza-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-zoxide", "to": "img-zoxide-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-tmux", "to": "img-fun-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "post-mise", "to": "img-fun-gif", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "tpl-index", "label": "EXTENDS", "title": "EXTENDS [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "tpl-page", "label": "EXTENDS", "title": "EXTENDS [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "tpl-section", "label": "EXTENDS", "title": "EXTENDS [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "tpl-taxonomy-list", "label": "EXTENDS", "title": "EXTENDS [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "tpl-taxonomy-single", "label": "EXTENDS", "title": "EXTENDS [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "partial-header", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "partial-search-modal", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "partial-footer", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "js-header", "label": "LOADS_SCRIPT", "title": "LOADS_SCRIPT [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "js-search", "label": "LOADS_SCRIPT", "title": "LOADS_SCRIPT [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-base", "to": "img-favicon", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-index", "to": "partial-blog-card", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-page", "to": "partial-breadcrumbs", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-section", "to": "partial-blog-card", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-section", "to": "partial-breadcrumbs", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-section", "to": "partial-sidebar-widgets", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-taxonomy-list", "to": "partial-sidebar-widgets", "label": "RELATED_TAXONOMY_NAV", "title": "RELATED_TAXONOMY_NAV [AMBIGUOUS]", "dashes": true, "width": 1, "color": {"opacity": 0.35}, "confidence": "AMBIGUOUS"}, {"from": "tpl-taxonomy-single", "to": "partial-blog-card", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-taxonomy-single", "to": "partial-breadcrumbs", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "tpl-taxonomy-single", "to": "partial-sidebar-widgets", "label": "INCLUDES", "title": "INCLUDES [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "partial-header", "to": "img-logo-dark", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}, {"from": "partial-footer", "to": "img-logo-dark", "label": "REFERENCES_IMAGE", "title": "REFERENCES_IMAGE [EXTRACTED]", "dashes": false, "width": 2, "color": {"opacity": 0.7}, "confidence": "EXTRACTED"}];
+const LEGEND = [{"cid": 0, "color": "#4E79A7", "label": "Base Layout Shell", "count": 9}, {"cid": 1, "color": "#F28E2B", "label": "2024 CLI Posts", "count": 8}, {"cid": 2, "color": "#E15759", "label": "Content Page Layouts", "count": 6}, {"cid": 3, "color": "#76B7B2", "label": "Search Script Flow", "count": 4}, {"cid": 4, "color": "#59A14F", "label": "Homepage Content Feed", "count": 4}, {"cid": 5, "color": "#EDC948", "label": "General Utility Posts", "count": 4}, {"cid": 6, "color": "#B07AA1", "label": "2025 Workflow Posts", "count": 3}, {"cid": 7, "color": "#FF9DA7", "label": "Header Menu Script", "count": 2}, {"cid": 8, "color": "#9C755F", "label": "Cheatsheet Assets", "count": 2}, {"cid": 9, "color": "#BAB0AC", "label": "Agent Design Policy", "count": 2}];
+
+// HTML-escape helper — prevents XSS when injecting graph data into innerHTML
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Build vis datasets
+const nodesDS = new vis.DataSet(RAW_NODES.map(n => ({
+  id: n.id, label: n.label, color: n.color, size: n.size,
+  font: n.font, title: n.title,
+  _community: n.community, _community_name: n.community_name,
+  _source_file: n.source_file, _file_type: n.file_type, _degree: n.degree,
+})));
+
+const edgesDS = new vis.DataSet(RAW_EDGES.map((e, i) => ({
+  id: i, from: e.from, to: e.to,
+  label: '',
+  title: e.title,
+  dashes: e.dashes,
+  width: e.width,
+  color: e.color,
+  arrows: { to: { enabled: true, scaleFactor: 0.5 } },
+})));
+
+const container = document.getElementById('graph');
+const network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, {
+  physics: {
+    enabled: true,
+    solver: 'forceAtlas2Based',
+    forceAtlas2Based: {
+      gravitationalConstant: -60,
+      centralGravity: 0.005,
+      springLength: 120,
+      springConstant: 0.08,
+      damping: 0.4,
+      avoidOverlap: 0.8,
+    },
+    stabilization: { iterations: 200, fit: true },
+  },
+  interaction: {
+    hover: true,
+    tooltipDelay: 100,
+    hideEdgesOnDrag: true,
+    navigationButtons: false,
+    keyboard: false,
+  },
+  nodes: { shape: 'dot', borderWidth: 1.5 },
+  edges: { smooth: { type: 'continuous', roundness: 0.2 }, selectionWidth: 3 },
+});
+
+network.once('stabilizationIterationsDone', () => {
+  network.setOptions({ physics: { enabled: false } });
+});
+
+function showInfo(nodeId) {
+  const n = nodesDS.get(nodeId);
+  if (!n) return;
+  const neighborIds = network.getConnectedNodes(nodeId);
+  const neighborItems = neighborIds.map(nid => {
+    const nb = nodesDS.get(nid);
+    const color = nb ? nb.color.background : '#555';
+    return `<span class="neighbor-link" style="border-left-color:${esc(color)}" onclick="focusNode(${JSON.stringify(nid)})">${esc(nb ? nb.label : nid)}</span>`;
+  }).join('');
+  document.getElementById('info-content').innerHTML = `
+    <div class="field"><b>${esc(n.label)}</b></div>
+    <div class="field">Type: ${esc(n._file_type || 'unknown')}</div>
+    <div class="field">Community: ${esc(n._community_name)}</div>
+    <div class="field">Source: ${esc(n._source_file || '-')}</div>
+    <div class="field">Degree: ${n._degree}</div>
+    ${neighborIds.length ? `<div class="field" style="margin-top:8px;color:#aaa;font-size:11px">Neighbors (${neighborIds.length})</div><div id="neighbors-list">${neighborItems}</div>` : ''}
+  `;
+}
+
+function focusNode(nodeId) {
+  network.focus(nodeId, { scale: 1.4, animation: true });
+  network.selectNodes([nodeId]);
+  showInfo(nodeId);
+}
+
+// Track hovered node — hover detection is more reliable than click params
+let hoveredNodeId = null;
+network.on('hoverNode', params => {
+  hoveredNodeId = params.node;
+  container.style.cursor = 'pointer';
+});
+network.on('blurNode', () => {
+  hoveredNodeId = null;
+  container.style.cursor = 'default';
+});
+container.addEventListener('click', () => {
+  if (hoveredNodeId !== null) {
+    showInfo(hoveredNodeId);
+    network.selectNodes([hoveredNodeId]);
+  }
+});
+network.on('click', params => {
+  if (params.nodes.length > 0) {
+    showInfo(params.nodes[0]);
+  } else if (hoveredNodeId === null) {
+    document.getElementById('info-content').innerHTML = '<span class="empty">Click a node to inspect it</span>';
+  }
+});
+
+const searchInput = document.getElementById('search');
+const searchResults = document.getElementById('search-results');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.toLowerCase().trim();
+  searchResults.innerHTML = '';
+  if (!q) { searchResults.style.display = 'none'; return; }
+  const matches = RAW_NODES.filter(n => n.label.toLowerCase().includes(q)).slice(0, 20);
+  if (!matches.length) { searchResults.style.display = 'none'; return; }
+  searchResults.style.display = 'block';
+  matches.forEach(n => {
+    const el = document.createElement('div');
+    el.className = 'search-item';
+    el.textContent = n.label;
+    el.style.borderLeft = `3px solid ${n.color.background}`;
+    el.style.paddingLeft = '8px';
+    el.onclick = () => {
+      network.focus(n.id, { scale: 1.5, animation: true });
+      network.selectNodes([n.id]);
+      showInfo(n.id);
+      searchResults.style.display = 'none';
+      searchInput.value = '';
+    };
+    searchResults.appendChild(el);
+  });
+});
+document.addEventListener('click', e => {
+  if (!searchResults.contains(e.target) && e.target !== searchInput)
+    searchResults.style.display = 'none';
+});
+
+const hiddenCommunities = new Set();
+
+function toggleAllCommunities(hide) {
+  document.querySelectorAll('.legend-item').forEach(item => {
+    hide ? item.classList.add('dimmed') : item.classList.remove('dimmed');
+  });
+  LEGEND.forEach(c => {
+    if (hide) hiddenCommunities.add(c.cid); else hiddenCommunities.delete(c.cid);
+  });
+  const updates = RAW_NODES.map(n => ({ id: n.id, hidden: hide }));
+  nodesDS.update(updates);
+}
+
+const legendEl = document.getElementById('legend');
+LEGEND.forEach(c => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.innerHTML = `<div class="legend-dot" style="background:${c.color}"></div>
+    <span class="legend-label">${c.label}</span>
+    <span class="legend-count">${c.count}</span>`;
+  item.onclick = () => {
+    if (hiddenCommunities.has(c.cid)) {
+      hiddenCommunities.delete(c.cid);
+      item.classList.remove('dimmed');
+    } else {
+      hiddenCommunities.add(c.cid);
+      item.classList.add('dimmed');
+    }
+    const updates = RAW_NODES
+      .filter(n => n.community === c.cid)
+      .map(n => ({ id: n.id, hidden: hiddenCommunities.has(c.cid) }));
+    nodesDS.update(updates);
+  };
+  legendEl.appendChild(item);
+});
+</script>
+<script>
+// Render hyperedges as shaded regions
+const hyperedges = [{"id": "hx-template-composition", "relation": "TEMPLATE_COMPOSITION", "nodes": ["tpl-base", "partial-header", "partial-search-modal", "partial-footer", "js-header", "js-search"], "confidence": "EXTRACTED", "confidence_score": 0.98, "source_file": "/Users/aitonakajima/github/zolasite/templates/base.html", "source_location": "17-27", "weight": 1.0}, {"id": "hx-homepage-content-pipeline", "relation": "HOMEPAGE_CONTENT_PIPELINE", "nodes": ["tpl-index", "content-home", "blog-section-index", "partial-blog-card"], "confidence": "EXTRACTED", "confidence_score": 0.97, "source_file": "/Users/aitonakajima/github/zolasite/templates/index.html", "source_location": "4-90", "weight": 0.95}, {"id": "hx-blog-post-image-pattern", "relation": "POST_FRONTMATTER_IMAGE_PATTERN", "nodes": ["post-cheatsheet", "post-python-virtualenv", "post-git-worktree", "post-cloudflare", "post-bat", "post-eza", "post-zoxide", "post-tmux", "post-mise", "img-fun-gif", "img-bat-gif", "img-eza-gif", "img-zoxide-gif"], "confidence": "EXTRACTED", "confidence_score": 0.96, "source_file": "/Users/aitonakajima/github/zolasite/content/blog", "source_location": "front-matter extra.image", "weight": 0.9}];
+// afterDrawing passes ctx already transformed to network coordinate space.
+// Draw node positions raw — no manual pan/zoom/DPR math needed.
+network.on('afterDrawing', function(ctx) {
+    hyperedges.forEach(h => {
+        const positions = h.nodes
+            .map(nid => network.getPositions([nid])[nid])
+            .filter(p => p !== undefined);
+        if (positions.length < 2) return;
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.fillStyle = '#6366f1';
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        // Centroid and expanded hull in network coordinates
+        const cx = positions.reduce((s, p) => s + p.x, 0) / positions.length;
+        const cy = positions.reduce((s, p) => s + p.y, 0) / positions.length;
+        const expanded = positions.map(p => ({
+            x: cx + (p.x - cx) * 1.15,
+            y: cy + (p.y - cy) * 1.15
+        }));
+        ctx.moveTo(expanded[0].x, expanded[0].y);
+        expanded.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 0.4;
+        ctx.stroke();
+        // Label
+        ctx.globalAlpha = 0.8;
+        ctx.fillStyle = '#4f46e5';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(h.label, cx, cy - 5);
+        ctx.restore();
+    });
+});
+</script>
+</body>
+</html>

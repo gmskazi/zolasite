@@ -54,6 +54,23 @@ mise run lint:scss
 mise run build
 ```
 
+## Graphify (OpenCode) via mise
+
+Initialize Graphify, install OpenCode integration, and enable commit hooks:
+
+```bash
+mise run graphify:init
+```
+
+Build or update the project knowledge graph:
+
+```bash
+mise run graphify:build
+mise run graphify:update
+```
+
+Graphify hooks are installed during init and refresh graph data after commits and branch switches.
+
 ## Build
 
 ```bash

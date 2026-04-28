@@ -2,6 +2,8 @@
 node = "22"
 zola = "0.22.1"
 gitleaks = "latest"
+python = "3.13"
+uv = "latest"
 
 [tasks.deps]
 description = "Install local lint dependencies"
@@ -28,3 +30,15 @@ run = "zola build"
 [tasks.check]
 description = "Run all checks"
 depends = ["scan:secrets", "lint:md", "lint:scss", "build"]
+
+[tasks."graphify:init"]
+description = "Install Graphify and OpenCode integration"
+run = "uv tool install graphifyy && graphify install --platform opencode && graphify opencode install && graphify hook install"
+
+[tasks."graphify:build"]
+description = "Build Graphify knowledge graph"
+run = "graphify ."
+
+[tasks."graphify:update"]
+description = "Update Graphify knowledge graph"
+run = "graphify . --update"
