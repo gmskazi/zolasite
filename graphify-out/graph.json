@@ -125,7 +125,7 @@
       "captured_at": "2026-04-28T00:00:00Z",
       "author": "Aito Nakajima",
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "project readme",
       "id": "readme"
     },
@@ -164,7 +164,7 @@
       "captured_at": "2026-04-28T00:00:00Z",
       "author": "Aito Nakajima",
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "home content front matter",
       "id": "content-home"
     },
@@ -177,7 +177,7 @@
       "captured_at": "2026-04-28T00:00:00Z",
       "author": "Aito Nakajima",
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "blog section index",
       "id": "blog-section-index"
     },
@@ -216,7 +216,7 @@
       "captured_at": "2026-04-28T00:00:00Z",
       "author": "Aito Nakajima",
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "2026 archive index",
       "id": "blog-2026-index"
     },
@@ -320,7 +320,7 @@
       "captured_at": "2026-04-28T00:00:00Z",
       "author": "Aito Nakajima",
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "post: tmux workflow",
       "id": "post-tmux"
     },
@@ -333,7 +333,7 @@
       "captured_at": "2026-04-28T00:00:00Z",
       "author": "Aito Nakajima",
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "post: getting started with mise",
       "id": "post-mise"
     },
@@ -359,7 +359,7 @@
       "captured_at": "2026-04-28T00:00:00Z",
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 5,
       "norm_label": "template: index.html",
       "id": "tpl-index"
     },
@@ -528,7 +528,7 @@
       "captured_at": "2026-04-28T00:00:00Z",
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "image: fun.gif",
       "id": "img-fun-gif"
     },
