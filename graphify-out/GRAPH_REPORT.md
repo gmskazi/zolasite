@@ -64,11 +64,11 @@ Nodes (6): Partial: blog card, Partial: breadcrumbs, Partial: sidebar widgets, T
 
 ### Community 4 - "Community 4"
 Cohesion: 0.5
-Nodes (4): 2026 Archive Index, Image: fun.gif, Post: Getting Started with mise, Post: tmux workflow
+Nodes (4): Blog Section Index, Home Content Front Matter, Project README, Template: index.html
 
 ### Community 5 - "Community 5"
 Cohesion: 0.5
-Nodes (4): Blog Section Index, Home Content Front Matter, Project README, Template: index.html
+Nodes (4): 2026 Archive Index, Image: fun.gif, Post: Getting Started with mise, Post: tmux workflow
 
 ### Community 6 - "Community 6"
 Cohesion: 0.67
@@ -99,11 +99,11 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `Template: taxonomy_list.html` and `Partial: sidebar widgets`?**
   _Edge tagged AMBIGUOUS (relation: RELATED_TAXONOMY_NAV) - confidence is low._
-- **Why does `Blog Section Index` connect `Community 5` to `Community 8`, `Community 1`, `Community 4`, `Community 6`?**
+- **Why does `Blog Section Index` connect `Community 4` to `Community 8`, `Community 1`, `Community 5`, `Community 6`?**
   _High betweenness centrality (0.451) - this node is a cross-community bridge._
-- **Why does `Template: base.html` connect `Community 0` to `Community 9`, `Community 2`, `Community 5`?**
+- **Why does `Template: base.html` connect `Community 0` to `Community 9`, `Community 2`, `Community 4`?**
   _High betweenness centrality (0.419) - this node is a cross-community bridge._
-- **Why does `Template: index.html` connect `Community 5` to `Community 0`, `Community 2`?**
+- **Why does `Template: index.html` connect `Community 4` to `Community 0`, `Community 2`?**
   _High betweenness centrality (0.390) - this node is a cross-community bridge._
 - **Are the 10 inferred relationships involving `Blog Section Index` (e.g. with `Project README` and `Post: Cheatsheet`) actually correct?**
   _`Blog Section Index` has 10 INFERRED edges - model-reasoned connections that need verification._

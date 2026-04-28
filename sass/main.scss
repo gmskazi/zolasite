@@ -1102,6 +1102,7 @@ main {
 }
 
 .content pre {
+  position: relative;
   overflow-x: auto;
   border: 1px solid var(--wired-black);
   margin: var(--space-5) 0;
@@ -1112,6 +1113,43 @@ main {
 .content pre code {
   padding: 0;
   background: transparent;
+}
+
+.copy-code-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  background: #171a20;
+  color: var(--caption-gray);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 150ms ease, border-color 150ms ease, color 150ms ease, background-color 150ms ease;
+}
+
+.content pre:hover .copy-code-btn,
+.copy-code-btn:focus-visible {
+  opacity: 1;
+}
+
+.copy-code-btn:hover,
+.copy-code-btn:focus-visible {
+  border-color: var(--wired-black);
+  color: var(--wired-black);
+  background: #1e2229;
+}
+
+.copy-code-btn.copied {
+  border-color: #2d6a4f;
+  color: #52b788;
+  background: #1b2e23;
+  opacity: 1;
 }
 
 .content blockquote {
