@@ -18,6 +18,7 @@ zola build
 
 ## Before Finishing Changes
 
+- Run `mise check` and fix any lint/format errors.
 - Run `zola build` and fix any template/content errors.
 - For iterative UI work, validate locally with `zola serve --drafts --open`.
 
