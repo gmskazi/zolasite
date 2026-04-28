@@ -62,6 +62,7 @@
               <img src="{{ feature.image }}" alt="{{ feature.title }}" />
             </div>
             <div class="feature-copy">
+              <p class="eyebrow">{{ feature.title }}</p>
               <h3>{{ feature.title }}</h3>
               <p>{{ feature.content }}</p>
               {% if feature.button.enable %}
@@ -84,7 +85,7 @@
             <a class="btn btn-link" href="/blog/">View all posts</a>
           </div>
 
-          <div class="post-grid">
+          <div class="story-grid">
             {% for page in blog_section.pages | slice(end=3) %}
               {% include "partials/blog_card.html" %}
             {% endfor %}

@@ -447,7 +447,7 @@ main {
 .home-page .feature-card {
   margin-bottom: var(--space-5);
   border: 1px solid var(--hairline);
-  background: linear-gradient(135deg, rgba(26, 31, 42, 0.62), rgba(10, 13, 18, 0.8));
+  background: #0f1218;
   padding: var(--space-5);
 }
 
@@ -582,6 +582,98 @@ main {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.story-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+.story-tile {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--hairline);
+  padding: var(--space-4);
+  background: transparent;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.story-tile:hover,
+.story-tile:focus-within {
+  transform: translateY(-3px);
+  border-color: #3d4a5f;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+}
+
+.story-tile-kicker {
+  margin-bottom: var(--space-3);
+  color: var(--caption-gray);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+.story-tile-kicker a {
+  color: var(--caption-gray);
+  text-decoration: none;
+}
+
+.story-tile-kicker a:hover,
+.story-tile-kicker a:focus-visible {
+  color: var(--link-blue);
+}
+
+.story-tile-image {
+  display: block;
+  margin-bottom: var(--space-4);
+  text-decoration: none;
+}
+
+.story-tile-image img {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  border: 1px solid rgba(79, 91, 110, 0.38);
+}
+
+.story-tile-title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.8vw, 32px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.3px;
+  margin-bottom: var(--space-2);
+}
+
+.story-tile-title a {
+  color: var(--page-ink);
+  text-decoration: none;
+}
+
+.story-tile-title a:hover,
+.story-tile-title a:focus-visible {
+  color: var(--link-blue);
+  text-decoration: underline;
+}
+
+.story-tile-meta {
+  margin-bottom: var(--space-2);
+  color: var(--caption-gray);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.33;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+.story-tile-summary {
+  margin-top: var(--space-2);
+  font-size: 15px;
+  line-height: 1.5;
+  color: #a9afb9;
+}
+
+/* Legacy card styles kept for easy rollback */
 .post-card {
   height: 100%;
   display: flex;
@@ -827,7 +919,10 @@ main {
 
 .post-hero {
   width: 100%;
-  aspect-ratio: 16/9;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  aspect-ratio: 21/9;
   object-fit: cover;
   margin-bottom: var(--space-6);
 }
